@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLB 3D Viewer</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+        let scene, camera, renderer;
+
+        function init() {
+            // シーンの作成
+            scene = new THREE.Scene();
+            
+            // カメラの設定 (視点, アスペクト比, 視野の距離)
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // レンダラーの作成
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // GLTF/GLBファイルのロード
+            const loader = new THREE.GLTFLoader();
+            loader.load('https://drive.google.com/uc?export=download&id=111VgABJKtaJc5hAj1zkWKC_UQleS5AVA', function(gltf) {
+                scene.add(gltf.scene);
+            }, undefined, function(error) {
+                console.error(error);
+            });
+
+            // ライトの追加
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(1, 1, 1).normalize();
+            scene.add(light);
+
+            // ウィンドウリサイズに対応
+            window.addEventListener('resize', function() {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            });
+        }
+
+        // レンダリングループ
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // シーンの描画
+            renderer.render(scene, camera);
+        }
+
+        // 初期化とアニメーションの開始
+        init();
+        animate();
+    </script>
+</body>
+</html>
